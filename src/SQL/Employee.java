@@ -26,19 +26,19 @@ public class Employee {
         String dateFormat="yyyy-MM-dd";
         //private int deptNo;
 
-        //get student's attribute values from the keyboard
+        //get employee's attribute values from the keyboard
         public void getEmployee(){
 
                 System.out.println("Donner l'ID de l'employee");
                 int id = s.nextInt();
                 this.id = id;
 
-                System.out.println("Donner le nom de employee");
+                System.out.println("Donner les nom de employee");
                 String nom = s.nextLine();
                 this.name=nom;
 
                 System.out.println("Donner la date de naissance de l'employee");
-                String date = s.next();
+                String date = s.nextLine();
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateFormat);  //format de la date
                 this.birthdate= LocalDate.parse(date, formatter);
 

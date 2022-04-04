@@ -1,10 +1,12 @@
 package SQL;
 
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.sql.DriverManager.getConnection;
 
 public class DBConnection {
     private static String url="jdbc:postgresql://localhost:5432/companydb";
@@ -16,9 +18,10 @@ public class DBConnection {
 
         try
         {
-            conn = DriverManager.getConnection(url, userName, password);
+            conn = getConnection(url, userName, password);
             System.out.println("Connection has been established");
             // conn.close();
+
         }
         catch(SQLException e)
         {
@@ -54,34 +57,54 @@ public class DBConnection {
         conn.close();
     }
 
-
     public static boolean insertEmployee(Employee emp) throws SQLException {
-        try{
 
-            Connection con = getDbConnection();
-            String req = "insert into Employee values(?,?,?,?,?,?)";
+        try
+        {
+            Connection conn = getDbConnection();
+            String req="insert into employee values(?,?,?,?,?,?)";
             PreparedStatement ps = conn.prepareStatement(req);
             ps.setInt(1,emp.getId());
             ps.setString(2,emp.getName());
             ps.setObject(3,emp.getBirthdate());
-            ps.setBigDecimal(5,emp.getSalary());
+            ps.setBigDecimal(4,emp.getSalary());
             ps.setObject(5,emp.getHiredate());
             ps.setInt(6,emp.getManagerId());
             ps.executeUpdate();
             ps.close();
-            System.out.println("Exécuté");
             return true;
 
-        }catch (SQLException  er){
-            System.out.println(er.getErrorCode());
-            return false;
+        }catch(SQLException e) {
+            System.out.println("Sql State = "+e.getSQLState()+"\nException Message = "+e.getMessage());
         }
         finally{
-            if(conn!=null){
-                closeConnection();
-            }
+            closeConnection();
         }
+        return false;
     }
 
+    public static List<Employee> getAllEmployee(){
+        List<Employee> lstEmployee = new ArrayList<>();
+        try {
+            Connection conn = getDbConnection();
+            String req="select * from employee";
+            PreparedStatement ps = conn.prepareStatement(req);
+            ResultSet rs = ps.executeQuery();
+            while(rs.next())
+            {
+                Employee emp = new Employee();
+                emp.setId(rs.getInt("id"));
+                emp.setName(rs.getString("name"));
+                emp.setBirthdate(rs.getObject("birthdate", LocalDate.class));
+                emp.setSalary(rs.getBigDecimal("salary"));
+                emp.setHiredate(rs.getObject("hiredate", LocalDate.class));
+                emp.setManagerId(rs.getInt("mgr_id"));
+                lstEmployee.add(emp);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return lstEmployee;
+    }
 
 }
