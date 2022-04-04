@@ -17,7 +17,7 @@ public class Employee {
         long id;
         String name;
         double salary;
-        int managerID;
+        long managerID;
         //    int depNo;
         LocalDate hireDate;
         LocalDate bithdate;
@@ -42,6 +42,6 @@ public class Employee {
                 System.out.println("salary?=");
                 this.salary=sc.nextDouble();
                 System.out.println("managerID?=");
-                this.managerID=sc.nextInt();
+                this.managerID=sc.nextLong();
         }
 }

@@ -85,7 +85,7 @@ public class DBConnection {
             ps.setLong(1,e.getId());
             ps.setString(2,e.getName());
             ps.setDouble(3,e.getSalary());
-            ps.setInt(4,e.getManagerID());
+            ps.setLong(4,e.getManagerID());
             ps.setObject(5,e.getHireDate());
             ps.setObject(6,e.getBithdate());
             ps.executeUpdate();
@@ -120,7 +120,7 @@ public class DBConnection {
                 employee.setBithdate(rs.getObject("birthdate", LocalDate.class));
                 employee.setHireDate(rs.getObject("hiredate", LocalDate.class));
                 employee.setSalary(rs.getDouble("salary"));
-                employee.setManagerID(rs.getInt("manager_id"));
+                employee.setManagerID(rs.getInt("mgr_id"));
                 lstEmployee.add(employee);
 
             }
@@ -165,6 +165,21 @@ public class DBConnection {
     public static void updateEmployee(Long id, Employee ne) throws SQLException{
         try{
 
+            Connection conn = getDbConnecion();
+            String request = " update employee name=? , birthdate=?, salary=?, hiredate=?,mgr_id=?";
+            PreparedStatement ps = conn.prepareStatement(request);
+            ps.setString(1,ne.getName());
+            ps.setObject(2,ne.getBithdate());
+            ps.setDouble(3,ne.getSalary());
+            ps.setObject(4,ne.getHireDate());
+            ps.setLong(5,ne.getManagerID());
+            ps.executeUpdate();
+            System.out.println("Employee with id = " + id +" has been successfully updated.");
+            ps.close();
+            if (ps.executeUpdate() == 0) {
+                throw new EmployeeNotFoundException("Employee with id = " + id +" not updated");
+            }
+
         }catch(EmployeeNotFoundException e) {
             System.out.println(e.getMessage());
         }
@@ -174,4 +189,4 @@ public class DBConnection {
         }
     }
 
-    }
+

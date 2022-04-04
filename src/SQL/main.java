@@ -43,6 +43,15 @@ public class main {
                 DBConnection.deleteEmployee(id);
                 break;
 
+                break;
+                case 6:
+                System.out.println("Id of the employee to be updated");
+                long idu = sc.nextLong();
+                DBConnection.updateEmployee(idu);
+                break;
+        }                                                                                                        !
+
+
         }while (choice != 4);
 
 
