@@ -1,60 +1,47 @@
 package SQL;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.math.BigDecimal;
-import java.sql.PreparedStatement;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+
 public class Employee {
-        Scanner s = new Scanner(System.in);
-        private int id;
-        private String name;
-        private LocalDate birthdate;
-        private BigDecimal salary;
-        private LocalDate hiredate;
-        private int managerId;
-        //declaration du format du date
-        String dateFormat="yyyy-MM-dd";
-        //private int deptNo;
 
-        //get employee's attribute values from the keyboard
+        long id;
+        String name;
+        double salary;
+        int managerID;
+        //    int depNo;
+        LocalDate hireDate;
+        LocalDate bithdate;
+
+
         public void getEmployee(){
-
-                System.out.println("Donner l'ID de l'employee");
-                int id = s.nextInt();
-                this.id = id;
-
-                System.out.println("Donner les nom de employee");
-                String nom = s.nextLine();
-                this.name=nom;
-
-                System.out.println("Donner la date de naissance de l'employee");
-                String date = s.nextLine();
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateFormat);  //format de la date
-                this.birthdate= LocalDate.parse(date, formatter);
-
-                System.out.println("Donner le salaire de l'employee");
-                BigDecimal salaire = s.nextBigDecimal();
-                this.salary=salaire;
-
-                System.out.println("Donner la date d'embauche de l'employee");
-                String date2 = s.next();
-                DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern(dateFormat);  //format de la date
-                this.hiredate= LocalDate.parse(date2, formatter2);
-
-                System.out.println("Donner l'ID du manager de l'employee");
-                int managerId = s.nextInt();
-                this.managerId=managerId;
+                Scanner sc=new Scanner(System.in);
+                System.out.println("id ? =");
+                this.id=sc.nextLong();
+                System.out.println("name? =");
+                sc.nextLine();
+                this.name=sc.nextLine();
+                System.out.println("Birthdate? =");
+                String birthday=sc.next();
+                //declaration de la format de la date
+                String dateformat="yyyy-MM-dd";
+                DateTimeFormatter format= DateTimeFormatter.ofPattern(dateformat);
+                this.bithdate=LocalDate.parse(birthday,format);
+                System.out.println("hiredate? =");
+                String hiredate=sc.next();
+                this.hireDate=LocalDate.parse(hiredate,format);
+                System.out.println("salary?=");
+                this.salary=sc.nextDouble();
+                System.out.println("managerID?=");
+                this.managerID=sc.nextInt();
         }
-
-
 }

@@ -1,110 +1,165 @@
 package SQL;
 
+import SQL.Exception.EmployeeNotFoundException;
 
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.sql.DriverManager.getConnection;
-
 public class DBConnection {
-    private static String url="jdbc:postgresql://localhost:5432/companydb";
-    private static String userName="companyuser";
-    private static String password="companyuser";
-    private static Connection conn;
-    public static Connection getDbConnection()
-    {
 
-        try
-        {
-            conn = getConnection(url, userName, password);
-            System.out.println("Connection has been established");
-            // conn.close();
+    static String url="jdbc:postgresql://localhost:5432/companydb";
+    static String userName="companyuser";
+    static String password="companyuser";
+    private static Connection conn;
+    //1ere etape cree la connexion
+
+    public static Connection getDbConnecion() {
+
+        try {
+            conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/companydb", "companyuser", "companyuser");
+            System.out.println("connection has been established");
+//            conn.close();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return conn;
+    }
+//        try(Connection conn=DriverManager.getConnection(url,userNmae,password))
+//        {
+//            System.out.println("Connection established");
+//        }
+//        catch(SQLException e)
+//        {
+//            e.printStackTrace();
+//        }
+//        return conn;
+//    }
+
+    public static void createTableEmployee(){
+        try{
+            //1ere etape : establish connection
+            Connection con = getDbConnecion();
+            //2eme etape :ecrire la requete
+            String request="create table employee("+
+                    "id bigint primary key,"+
+                    "name varchar not null,"+
+                    "salary real,"+
+                    "manager_id int null,"+
+                    "hiredate date,"+
+                    "birthdate date"+
+                    ")";
+            //foreign key not not
+            //3eme etape cree statement
+            PreparedStatement ps=con.prepareStatement(request);
+            //4eme etape : execute sql query
+            ps.executeUpdate();
+            System.out.println("The employee table has been successfully created");
+
 
         }
         catch(SQLException e)
         {
             e.printStackTrace();
         }
-        return conn;
-    }
 
-    public static void createTableEmployee()
-    {
-        try {
-            //step 1 : establish connection
-            Connection con=getDbConnection();
-            //step 2-Write the sql request
-            String request ="create table Employee ("+
-                    "id bigint primary key,"+
-                    "name varchar not null,"+
-                    "birthdate date,"+
-                    "salary real,"+
-                    "hiredate date,"+
-                    "mgr_id int null"+
-                    ")";
-            //step 3 : create Statement
-            PreparedStatement ps=con.prepareStatement(request);
-            //step 4 : Execute sql Query
-            ps.executeUpdate();
-            System.out.println("The Employee table has been successfully created");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
-    public static void closeConnection() throws SQLException {
+    public static void closeConnection()throws SQLException
+    {
         conn.close();
     }
+    public static boolean AjoutEmployee(Employee e) throws SQLException {
+        //n'est pas static car il va modifier les attribut
 
-    public static boolean insertEmployee(Employee emp) throws SQLException {
-
-        try
-        {
-            Connection conn = getDbConnection();
-            String req="insert into employee values(?,?,?,?,?,?)";
-            PreparedStatement ps = conn.prepareStatement(req);
-            ps.setInt(1,emp.getId());
-            ps.setString(2,emp.getName());
-            ps.setObject(3,emp.getBirthdate());
-            ps.setBigDecimal(4,emp.getSalary());
-            ps.setObject(5,emp.getHiredate());
-            ps.setInt(6,emp.getManagerId());
+        try {
+            Connection con = getDbConnecion();
+            //methode 1:
+//            String request="insert into Employee " +
+//                    "values("+5+","+"Ahmed"+","+1800+","+3+","+"14/10/1990"+","+"15/11/2012"+")";
+            //methode 2:
+            String request="insert into Employee " +
+                    "values(?,?,?,?,?,?)";
+            PreparedStatement ps=con.prepareStatement(request);
+            ps.setLong(1,e.getId());
+            ps.setString(2,e.getName());
+            ps.setDouble(3,e.getSalary());
+            ps.setInt(4,e.getManagerID());
+            ps.setObject(5,e.getHireDate());
+            ps.setObject(6,e.getBithdate());
             ps.executeUpdate();
             ps.close();
             return true;
-
-        }catch(SQLException e) {
-            System.out.println("Sql State = "+e.getSQLState()+"\nException Message = "+e.getMessage());
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         }
-        finally{
+        finally {
             closeConnection();
+            return false;
         }
-        return false;
-    }
 
-    public static List<Employee> getAllEmployee(){
+    }
+    public void suppEmployee(){
+
+    }
+    public static List<Employee>getAllEmployee()throws SQLException {
         List<Employee> lstEmployee = new ArrayList<>();
         try {
-            Connection conn = getDbConnection();
-            String req="select * from employee";
-            PreparedStatement ps = conn.prepareStatement(req);
+            Connection con = getDbConnecion();
+            String request = "select * from employee";
+            PreparedStatement ps = con.prepareStatement(request);
+            ps.executeQuery();
             ResultSet rs = ps.executeQuery();
-            while(rs.next())
-            {
-                Employee emp = new Employee();
-                emp.setId(rs.getInt("id"));
-                emp.setName(rs.getString("name"));
-                emp.setBirthdate(rs.getObject("birthdate", LocalDate.class));
-                emp.setSalary(rs.getBigDecimal("salary"));
-                emp.setHiredate(rs.getObject("hiredate", LocalDate.class));
-                emp.setManagerId(rs.getInt("mgr_id"));
-                lstEmployee.add(emp);
+            while (rs.next()) {
+                //create Employee
+                Employee employee = new Employee();
+                employee.setId(rs.getInt("id"));
+                employee.setName(rs.getString("name"));
+                //cast pour la date
+                employee.setBithdate(rs.getObject("birthdate", LocalDate.class));
+                employee.setHireDate(rs.getObject("hiredate", LocalDate.class));
+                employee.setSalary(rs.getDouble("salary"));
+                employee.setManagerID(rs.getInt("manager_id"));
+                lstEmployee.add(employee);
+
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            closeConnection();
         }
         return lstEmployee;
     }
 
-}
+    public static void deleteEmployee(int id)throws SQLException {
+    try{
+        Connection con= getDbConnecion();
+        String request = "Select id from where id = ?";
+        //ken je string naamlou "'" + "'"
+        PreparedStatement ps = con.prepareStatement(request);
+        ps.setLong(1,id);
+        ResultSet rs = ps.executeQuery();
+        boolean r = rs.next();
+        if(!r){
+            throw new EmployeeNotFoundException("There's no employee with that ID");
+        }
+        ps.close();
+            request = "delete from employee where id = "+id;
+            ps = con.prepareStatement(request);
+            ps.executeUpdate();
+            System.out.println("Employee with id = " + id +" has been successfully deleted.");
+            ps.close();
+    }
+    catch(SQLException e){
+        System.err.format("SQL State: " + e.getSQLState());
+    }
+    catch (EmployeeNotFoundException e){
+        System.out.println(e.getMessage());
+    }
+    finally {
+        closeConnection();
+    }
+    }
+
+
+    }
