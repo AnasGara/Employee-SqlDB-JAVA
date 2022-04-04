@@ -78,8 +78,9 @@ public class DBConnection {
 //            String request="insert into Employee " +
 //                    "values("+5+","+"Ahmed"+","+1800+","+3+","+"14/10/1990"+","+"15/11/2012"+")";
             //methode 2:
-            String request="insert into Employee " +
+            String request="insert into Employee (id,name,salary,mgr_id,hiredate,birthdate)" +
                     "values(?,?,?,?,?,?)";
+            //lazem fard ordre sinon nzidou el paretjèses
             PreparedStatement ps=con.prepareStatement(request);
             ps.setLong(1,e.getId());
             ps.setString(2,e.getName());
@@ -131,7 +132,7 @@ public class DBConnection {
         return lstEmployee;
     }
 
-    public static void deleteEmployee(int id)throws SQLException {
+    public static void deleteEmployee(long id)throws SQLException {
     try{
         Connection con= getDbConnecion();
         String request = "Select id from where id = ?";
@@ -161,5 +162,16 @@ public class DBConnection {
     }
     }
 
+    public static void updateEmployee(Long id, Employee ne) throws SQLException{
+        try{
+
+        }catch(EmployeeNotFoundException e) {
+            System.out.println(e.getMessage());
+        }
+        finally {
+            closeConnection();
+        }
+        }
+    }
 
     }

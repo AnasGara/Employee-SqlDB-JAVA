@@ -18,7 +18,7 @@ public class main {
 
         do {
             choice = sc.nextInt();
-        }while (choice < 1 || choice>4);
+        }while (choice < 1 || choice>5);
 
         switch (choice) {
             case 1:
@@ -36,6 +36,11 @@ public class main {
                 System.out.println("list of employees :");
                 for(Employee e : lstres)
                     System.out.println(e);
+                break;
+            case  4:
+                System.out.println("Id of the employee to be deleted");
+                long id = sc.nextLong();
+                DBConnection.deleteEmployee(id);
                 break;
 
         }while (choice != 4);
